@@ -25,8 +25,8 @@ const curveTBTC = 0.993918672520833622;
 export const ftbtc = 0.991463243406435166;
 const curveSlippage = 0.00477889549323731768365183858945;
 const startaBTC = 0.011575;
-export const faBTC = 0.01153114604062689254478449748869;
-export const aOwnership = 0.01163043220947715547239294178358; //ownership of fasset ftbtc
+const faBTC = 0.01153114604062689254478449748869;
+const aOwnership = 0.01163043220947715547239294178358; //ownership of fasset ftbtc
 const address =  '0x1f9d00eEAa4E6a4880D2ECe1B4E1be1202192DFB';
 
 const crvbtcContract = new web3.eth.Contract(proxyABI, crvtbtcaddress);
@@ -38,7 +38,7 @@ export const getTbtcFarmRewards = tbtcRewardsContract.methods.earned(address);
 const farmRewardsContract = new web3.eth.Contract(farmRewardsPoolABI, farmRewardsPoolAddress);
 export const getFarmRewards = farmRewardsContract.methods.balanceOf(address);
 
-export const obj = [
+const obj = [
   {title: 'fCRV:TBTC', contract: crvbtcContract, native: 'btc', decimals: '18', maxHistory: parseInt(((now - 1605048191000)/day))}
 ];
 

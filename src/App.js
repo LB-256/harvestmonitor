@@ -2,9 +2,9 @@ import React, { Fragment, useEffect, useState } from 'react';
 import './App.css';
 import axios from 'axios';
 import 'semantic-ui-css/semantic.min.css';
-import { web3, depositTime, getCurveSharePrice, getfAssetSharePrice, apiUrl, ftbtc, getTbtcFarmRewards, faBTC, aOwnership, getFarmRewards, farmDepositTime } from './Abi';
-import { Table, Grid, Loader } from 'semantic-ui-react';
-import { formatUnits, formatEther } from "@ethersproject/units";
+import { web3, depositTime, getCurveSharePrice, getfAssetSharePrice, apiUrl, ftbtc, getTbtcFarmRewards, getFarmRewards, farmDepositTime } from './Abi';
+import { Table, Grid, Loader, Icon } from 'semantic-ui-react';
+import { formatEther } from "@ethersproject/units";
 import farmlogo from './farm.png';
 import btclogo from './bitcoin.webp';
 import {Line} from 'react-chartjs-2';
@@ -24,33 +24,15 @@ function App() {
       seconds = parseInt(total_seconds % 60);
       minutes = parseInt(total_minutes % 60);
       hours = parseInt(total_hours % 24);
+      
       return { d: days, h: hours, m: minutes, s: seconds };
   }
 
   let deposit = millisToMinutesAndSeconds(depositTime);
   let depositFarm = millisToMinutesAndSeconds(farmDepositTime);
   setDepositState({depTime: deposit, depositFarm: depositFarm})
-  
+
   },[setDepositState])
-
-
-
-  const [priceData, setpriceData] = useState({
-    bitcoinData: {usd: 0, usd_24h_change: 0},
-    harvestData: {usd: 0, usd_24h_change: 0},
-  })
-  useEffect(()=> {
-
-    const axiosData = async () => {
-    try{
-      const data = await axios.get(apiUrl);
-      setpriceData({bitcoinData: data.data.bitcoin, harvestData: data.data['harvest-finance']})
-    }catch (error) {
-      console.error(error);
-    }  
-  }
-  axiosData()
-},[])
     
 
   const [state, setState] = useState({
@@ -59,47 +41,61 @@ function App() {
     btcUSDVal: 0,
     btcUSDCurVal: 0,
     farmUSDCurVal: 0,
-    tbtcFarmRewards: 0
+    tbtcFarmRewards: 0,
+    bitcoinData: {usd: 0, usd_24h_change: 0},
+    harvestData: {usd: 0, usd_24h_change: 0}
   });
   useEffect(() => {
-    
+
     const getPrices = async () => {
       try {    
-        
-        let btcUsd = priceData.bitcoinData.usd;
-        let farmUsd = priceData.harvestData.usd;
-        
-        const block = await web3.eth.getBlockNumber();
 
-        const promises = [
-          await getfAssetSharePrice.call({}, ), await getCurveSharePrice.call({}, ), await getTbtcFarmRewards.call({}, ), 
-          await getfAssetSharePrice.call({}, block-3500), await getCurveSharePrice.call({}, block - 3500), await getTbtcFarmRewards.call({}, block-3500), 
-          await getFarmRewards.call({}, ), await getFarmRewards.call({}, block-3500)]
-        const [share, curveShare, tbtcFarmRewards, share1d, curveShare1d, tbtcFarmRewards1d, farmRewards, farmRewards1d] = await Promise.all(promises)
-        
         console.time('a')
+
+        const block = await web3.eth.getBlockNumber();
+          const promises = [
+            await axios.get(apiUrl),
+            await getfAssetSharePrice.call({}, ), 
+            await getCurveSharePrice.call({}, ), 
+            await getTbtcFarmRewards.call({}, ), 
+            await getfAssetSharePrice.call({}, block-3500), 
+            await getCurveSharePrice.call({}, block-3500), 
+            await getTbtcFarmRewards.call({}, block-3500), 
+            await getFarmRewards.call({}, ), 
+            await getFarmRewards.call({}, block-3500)]
+          const [data, share, curveShare, tbtcFarmRewards, share1d, curveShare1d, tbtcFarmRewards1d, farmRewards, farmRewards1d] = await Promise.all(promises) 
+        
+        let btcUsd = data.data.bitcoin.usd;
+        let farmUsd = data.data['harvest-finance'].usd;
+
+        
         let btcUSDVal = ((ftbtc * formatEther(share))*formatEther(curveShare)) //get true btc by multiplying share prices from harvest and curve
         let btcGainTotal = btcUSDVal - 1 
+        let btcUSDCurVal = parseFloat((btcUSDVal*btcUsd).toFixed(2)) //true btc multipled by current price
         let btcGainTotalUSD = (btcGainTotal*btcUsd).toFixed(2)
         let btcGainPercent = ((btcGainTotal/1)*100).toFixed(2)
-
-        let rewardsFormat = parseFloat(formatEther(tbtcFarmRewards)) 
-        let btcUSDCurVal = parseFloat((btcUSDVal*btcUsd).toFixed(2)) //true btc multipled by current price
-        let farmUSDCurVal = parseFloat((rewardsFormat*farmUsd).toFixed(2))
-        let farmGainPercent = ((farmUSDCurVal/btcUSDCurVal)*100).toFixed(2)
-
-        let netProfitTotal = parseFloat(btcGainTotalUSD) + parseFloat(farmUSDCurVal)
-
+        let btcDataObj = {btcUSDVal: btcUSDVal.toFixed(6)}
+        
+        
         let btcUSDVal1d = ((ftbtc * formatEther(share1d))*formatEther(curveShare1d)) 
-
         let btcGainTotal1d = btcUSDVal - btcUSDVal1d
         let btcGainTotalUSD1d = (btcGainTotal1d*btcUsd).toFixed(2)
-        let btcGainPercent1d = ((btcGainTotal1d/1)*100).toFixed(2)
+        let btcGainPercent1d = ((btcGainTotal1d/1)*100).toFixed(4)
+
+       
+
+        let rewardsFormat = parseFloat(formatEther(tbtcFarmRewards)) 
+        let farmUSDCurVal = parseFloat((rewardsFormat*farmUsd).toFixed(2))
+        let farmGainPercent = ((farmUSDCurVal/btcUSDCurVal)*100).toFixed(2)
+        let netProfitTotal = parseFloat(btcGainTotalUSD) + parseFloat(farmUSDCurVal)
+        
+
 
         let rewardsFormat1d = parseFloat(formatEther(tbtcFarmRewards1d)) 
         let rewards1dDiff = (rewardsFormat - rewardsFormat1d).toFixed(6)
         let rewards1dUSDVal = (rewards1dDiff * farmUsd).toFixed(2)
         let rewards1dPercent = ((rewards1dUSDVal/(btcUSDVal*btcUsd))*100).toFixed(4)
+
 
 
         let farmRewardsFormat = parseFloat(formatEther(farmRewards)) 
@@ -112,11 +108,13 @@ function App() {
         let farmRewards1dChangeUSD = (farmRewards1dChange*farmUsd).toFixed(2)
         let farmRewards1dPercent = parseFloat(((farmRewards1dChangeUSD/farmRewardsCurVal)*100).toFixed(2))
         
+        
 
-        setState({
-        btcUSDVal: btcUSDVal.toFixed(6), tbtcFarmRewards: rewardsFormat.toFixed(6), btcUSDCurVal: btcUSDCurVal, 
-        farmUSDCurVal: farmUSDCurVal, btcGainTotal: btcGainTotal.toFixed(6), btcGainTotalUSD: btcGainTotalUSD, netProfitTotal: netProfitTotal.toFixed(2), btcGainPercent: btcGainPercent, farmGainPercent: farmGainPercent, 
-        btcGainTotal1d: btcGainTotal1d.toFixed(6), btcGainTotalUSD1d: btcGainTotalUSD1d, btcGainPercent1d: btcGainPercent1d, rewards1dDiff: rewards1dDiff, rewards1dUSDVal: rewards1dUSDVal, rewards1dPercent: rewards1dPercent, 
+        setState({bitcoinData: data.data.bitcoin, harvestData: data.data['harvest-finance'], btcDataObj: btcDataObj,
+        btcGainTotal: btcGainTotal.toFixed(6), btcGainTotalUSD: btcGainTotalUSD, btcGainPercent: btcGainPercent, btcUSDCurVal: btcUSDCurVal,
+        btcGainTotal1d: btcGainTotal1d.toFixed(6), btcGainTotalUSD1d: btcGainTotalUSD1d, btcGainPercent1d: btcGainPercent1d,
+        tbtcFarmRewards: rewardsFormat.toFixed(6), farmUSDCurVal: farmUSDCurVal, farmGainPercent: farmGainPercent, netProfitTotal: netProfitTotal.toFixed(2),
+        rewards1dDiff: rewards1dDiff, rewards1dUSDVal: rewards1dUSDVal, rewards1dPercent: rewards1dPercent,
         farmRewardsFormat: farmRewardsFormat.toFixed(4), farmRewardsCurVal: farmRewardsCurVal, farmRewardsTotal: farmRewardsTotal.toFixed(6), farmRewardsTotalUSD: farmRewardsTotalUSD, farmRewards1dChange: farmRewards1dChange.toFixed(6), 
         farmRewards1dChangeUSD: farmRewards1dChangeUSD, farmRewards1dPercent: farmRewards1dPercent,farmRewardsPercent: farmRewardsPercent, loading: false
         });
@@ -126,13 +124,11 @@ function App() {
         console.error(error);
       }  
     };
-
-    console.log(priceData.bitcoinData.usd)
     
       getPrices();
     
       
-  }, [priceData, setState]);
+  }, [setState]);
 
   
 
@@ -144,13 +140,14 @@ function App() {
 {state.loading === false ? 
 <Fragment>
 <h1>Yield Watcher</h1>
+
 <Grid columns={2} id="grid">
     <Grid.Row>
       <Grid.Column>
-      <img src={btclogo} width='30px' alt='BTC logo' /> <p>${(priceData.bitcoinData.usd).toLocaleString()}  ({priceData.bitcoinData.usd_24h_change.toFixed(2)}%)</p>
+      <img src={btclogo} width='30px' alt='BTC logo' /> <p>${(state.bitcoinData.usd).toLocaleString()}  ({state.bitcoinData.usd_24h_change.toFixed(2)}%)</p>
       </Grid.Column>
       <Grid.Column>
-      <img src={farmlogo} width='30px' alt='Farm logo' /> <p>${priceData.harvestData.usd}  ({priceData.harvestData.usd_24h_change.toFixed(2)}%)</p>
+      <img src={farmlogo} width='30px' alt='Farm logo' /> <p>${state.harvestData.usd}  ({state.harvestData.usd_24h_change.toFixed(2)}%)</p>
       </Grid.Column>
     </Grid.Row>
 </Grid>
@@ -172,7 +169,7 @@ function App() {
         <Table.Cell><img src={btclogo} width='50px' alt='BTC logo' /></Table.Cell>
 
         <Table.Cell>${state.btcUSDCurVal.toLocaleString()}</Table.Cell>
-        <Table.Cell>{state.btcUSDVal}</Table.Cell>
+        <Table.Cell>{state.btcDataObj.btcUSDVal}</Table.Cell>
 
         <Table.Cell>${state.btcGainTotalUSD1d}</Table.Cell>
         <Table.Cell>{state.btcGainTotal1d}</Table.Cell>

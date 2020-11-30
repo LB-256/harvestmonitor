@@ -18,8 +18,11 @@ p{
 
 #table{
   max-width: 80%;
-  font-size: 20px;
+  font-size: 18px;
   margin-bottom: 50px;
+}
+#table td{
+  padding:10px;
 }
 #grid{
   width: 20%;
