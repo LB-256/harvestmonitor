@@ -47,6 +47,7 @@ function App() {
   });
   useEffect(() => {
 
+
     const getPrices = async () => {
       try {    
 
@@ -101,7 +102,7 @@ function App() {
         let farmRewardsFormat = parseFloat(formatEther(farmRewards)) 
         let farmRewardsFormat1d = parseFloat(formatEther(farmRewards1d)) 
         let farmRewardsCurVal = (farmRewardsFormat*farmUsd).toFixed(2)
-        let farmRewardsTotal = (farmRewardsFormat - 7.69)
+        let farmRewardsTotal = (farmRewardsFormat - 8.202514933085391703)
         let farmRewardsTotalUSD = (farmRewardsTotal*farmUsd).toFixed(2)
         let farmRewardsPercent = parseFloat(((farmRewardsTotalUSD/farmRewardsCurVal)*100).toFixed(2))
         let farmRewards1dChange = (farmRewardsFormat - farmRewardsFormat1d)
@@ -115,7 +116,8 @@ function App() {
         btcGainTotal1d: btcGainTotal1d.toFixed(6), btcGainTotalUSD1d: btcGainTotalUSD1d, btcGainPercent1d: btcGainPercent1d,
         tbtcFarmRewards: rewardsFormat.toFixed(6), farmUSDCurVal: farmUSDCurVal, farmGainPercent: farmGainPercent, netProfitTotal: netProfitTotal.toFixed(2),
         rewards1dDiff: rewards1dDiff, rewards1dUSDVal: rewards1dUSDVal, rewards1dPercent: rewards1dPercent,
-        farmRewardsFormat: farmRewardsFormat.toFixed(4), farmRewardsCurVal: farmRewardsCurVal, farmRewardsTotal: farmRewardsTotal.toFixed(6), farmRewardsTotalUSD: farmRewardsTotalUSD, farmRewards1dChange: farmRewards1dChange.toFixed(6), 
+        farmRewardsFormat: farmRewardsFormat.toFixed(4), farmRewardsCurVal: farmRewardsCurVal, farmRewardsTotal: farmRewardsTotal.toFixed(6), 
+        farmRewardsTotalUSD: farmRewardsTotalUSD, farmRewards1dChange: farmRewards1dChange.toFixed(6), 
         farmRewards1dChangeUSD: farmRewards1dChangeUSD, farmRewards1dPercent: farmRewards1dPercent,farmRewardsPercent: farmRewardsPercent, loading: false
         });
         console.timeEnd('a')
