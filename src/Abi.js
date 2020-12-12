@@ -24,7 +24,7 @@ export const farmDepositTime = (now - 1606463551000);
 export const ftbtc = 0.998901728918095985;
 //const curveSlippage = 0.00477889549323731768365183858945; 
 export const startaBTC = 0.011575;
-export const startdBTC = 0.218853282225;
+export const startdBTC = 0.21152130666491853360488798370672;
 const address =  '0x1f9d00eEAa4E6a4880D2ECe1B4E1be1202192DFB';
 
 
