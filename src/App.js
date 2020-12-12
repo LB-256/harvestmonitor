@@ -210,7 +210,7 @@ function App() {
       </Table.Row> */}
     </Table.Body>
   </Table>
-
+{/*
   <h2>Farm Profit Share Table</h2> 
   <p>Deposited {depTime.depositFarm.d}d {depTime.depositFarm.h}h {depTime.depositFarm.m}m ago</p>
   <Table celled structured id="table">
@@ -240,7 +240,7 @@ function App() {
       </Table.Row>  
 
     </Table.Body>
-  </Table>
+</Table>*/}
 
   </Fragment> : <Loader id="loader" content='Loading' /> }
       </header>
