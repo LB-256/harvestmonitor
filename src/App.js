@@ -126,13 +126,10 @@ function App() {
 <Fragment>
 <h1>Yield Watcher</h1>
 
-<Grid columns={3} id="grid">
+<Grid columns={2} id="grid">
     <Grid.Row>
       <Grid.Column>
       <img src={btclogo} width='30px' alt='BTC logo' /> <p>${(state.bitcoinData.usd).toLocaleString()}  ({state.bitcoinData.usd_24h_change.toFixed(2)}%)</p>
-      </Grid.Column>
-      <Grid.Column>
-      <img src={farmlogo} width='30px' alt='Farm logo' /> <p>${state.harvestData.usd}  ({state.harvestData.usd_24h_change.toFixed(2)}%)</p>
       </Grid.Column>
       <Grid.Column>
       <img src={badgerlogo} width='30px' alt='Badger logo' /> <p>${(state.badgerData.usd).toLocaleString()}  ({state.badgerData.usd_24h_change.toFixed(2)}%)</p>
